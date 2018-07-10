@@ -28,7 +28,7 @@ def get_segmentation_filenames(path_to_files, extension='bmp'):
     # add to this list only those filenames with the corresponding extension
     for file in listdir(path_to_files):
         if file.endswith('.' + extension):
-            image_filenames = image_filenames + file
+            image_filenames = image_filenames + [ file ]
 
     return image_filenames
 
@@ -47,7 +47,7 @@ def save_csv_segmentation_table(table_filename, image_filenames, cup_dices, disc
     '''
 
     # write the data
-    with open(table_filename, 'wb') as csv_file:
+    with open(table_filename, 'w') as csv_file:
         # initialize the writer
         table_writer = csv.writer(csv_file)
         # write the column names
@@ -70,7 +70,7 @@ def save_csv_mean_segmentation_performance(output_filename, mean_cup_dice, mean_
     '''
 
     # write the data
-    with open(output_filename, 'wb') as csv_file:
+    with open(output_filename, 'w') as csv_file:
         # initialize the writer
         table_writer = csv.writer(csv_file)
         # write the column names

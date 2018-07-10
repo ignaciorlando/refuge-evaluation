@@ -4,7 +4,7 @@ import numpy as np
 from scipy import misc
 from os import path, makedirs
 
-from util.file_management import get_segmentation_filenames, save_csv_table
+from util.file_management import get_segmentation_filenames, save_csv_mean_segmentation_performance, save_csv_segmentation_table
 
 
 
@@ -81,7 +81,7 @@ def vertical_cup_to_disc_ratio(segmentation):
     # compute the cup diameter
     cup_diameter = vertical_diameter(segmentation==0)
     # compute the disc diameter
-    disc_diameter = vertical_diameter(segmentation==128)
+    disc_diameter = vertical_diameter(segmentation<255)
 
     return cup_diameter / disc_diameter
 
@@ -118,9 +118,9 @@ def evaluate_binary_segmentation(segmentation, gt_label):
     # compute the Dice coefficient for the optic cup
     cup_dice = dice_coefficient(segmentation==0, gt_label==0)
     # compute the Dice coefficient for the optic disc
-    disc_dice = dice_coefficient(segmentation==128, gt_label==128)
+    disc_dice = dice_coefficient(segmentation<255, gt_label<255)
     # compute the absolute error between the cup to disc ratio estimated from the segmentation vs. the gt label
-    cdr = absolute_error(vertical_cup_to_disc_ratio(segmentation), vertical_cup_to_disc_ratio(gt_label)
+    cdr = absolute_error(vertical_cup_to_disc_ratio(segmentation), vertical_cup_to_disc_ratio(gt_label))
 
     return cup_dice, disc_dice, cdr
 
@@ -167,7 +167,11 @@ def generate_table_of_results(image_filenames, segmentation_folder, gt_folder, i
                 else:
                     raise ValueError('Unable to find {} in your training folder. Make sure that you have the folder organized as provided in our website.'.format(image_filenames[i]))
         else:
-            gt_label = path.join(gt_folder, image_filenames[i])
+            gt_filename = path.join(gt_folder, image_filenames[i])
+            if path.exists(gt_filename):
+                gt_label = misc.imread(gt_filename)
+            else:
+                raise ValueError('Unable to find {} in your ground truth folder. If you are using training data, make sure to use the parameter is_training in True.'.format(image_filenames[i]))
 
         # evaluate the results and assign to the corresponding row in the table
         cup_dices[i], disc_dices[i], ae_cdrs[i] = evaluate_binary_segmentation(segmentation, gt_label)
@@ -221,7 +225,7 @@ def evaluate_segmentation_results(segmentation_folder, gt_folder, output_path=No
     # get all the image filenames
     image_filenames = get_segmentation_filenames(segmentation_folder)
     # create output path if it does not exist
-    if not(output_path is None) and (path.exists(output_path)):
+    if not (output_path is None) and not (path.exists(output_path)):
         makedirs(output_path)
 
     # generate a table of results
@@ -231,18 +235,18 @@ def evaluate_segmentation_results(segmentation_folder, gt_folder, output_path=No
         # initialize the table filename
         table_filename = path.join(output_path, 'evaluation_table_segmentation.csv')
         # save the table        
-        save_csv_table(table_filename, image_filenames, cup_dices, disc_dices, ae_cdrs)
+        save_csv_segmentation_table(table_filename, image_filenames, cup_dices, disc_dices, ae_cdrs)
 
     # compute the mean values
     mean_cup_dice, mean_disc_dice, mae_cdr = get_mean_values_from_table(cup_dices, disc_dices, ae_cdrs)
     # print the results on screen
     print('Dice Optic Cup = {}\nDice Optic Disc = {}\nMAE CDR = {}'.format(str(mean_cup_dice), str(mean_disc_dice), str(mae_cdr)))
     # save the mean values in the output path
-    if not(output_path is None)
+    if not(output_path is None):
         # initialize the output filename
         output_filename = path.join(output_path, 'evaluation_segmentation.csv')
         # save the results
-        save_csv_mean_segmentation_performance(mean_cup_dice, mean_disc_dice, mae_cdr)
+        save_csv_mean_segmentation_performance(output_filename, mean_cup_dice, mean_disc_dice, mae_cdr)
 
     # return the average performance
     return mean_cup_dice, mean_disc_dice, mae_cdr
