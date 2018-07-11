@@ -5,7 +5,7 @@ from util.file_management import read_csv_classification_results, sort_scores_by
 
 from sklearn.metrics import roc_auc_score, roc_curve
 from os import path, makedirs
-
+from scipy.interpolate import interp1d
 
 
 def get_roc_curve(predicted_scores, gt_labels):
@@ -42,11 +42,10 @@ def get_sensitivity_at_given_specificity(sensitivity, specificity, specificity_r
         sensitivity_value: sensitivity value at the specificity reference
     '''
 
-    # get the sensitivity at the reference value
-    sensitivity_value = sensitivity[specificity==specificity_reference]
-    # if there are many sensitivity values, just pick up the average
-    if len(sensitivity_value) > 1:
-        sensitivity_value = np.mean(sensitivity_value)
+    # interpolate a continue curve based on sensitivity and specificity
+    sensitivity_interp = interp1d(specificity, sensitivity)
+    # get the sensitivity value for the specificity reference
+    sensitivity_value = sensitivity_interp(specificity_reference)
 
     return sensitivity_value
 
