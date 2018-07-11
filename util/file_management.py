@@ -86,7 +86,7 @@ def sort_scores_by_filename(target_names, names_to_sort, values_to_sort):
     sorted_values = np.zeros(values_to_sort.shape)
 
     # iterate for each filename in the target names
-    for i in range(target_names):
+    for i in range(len(target_names)):
         # assign the value to the correct position in the array
         sorted_values[i] = values_to_sort[names_to_sort.index(target_names[i])]
     
@@ -156,7 +156,7 @@ def save_csv_classification_performance(output_filename, auc, reference_sensitiv
     # open the file
     with open(output_filename, 'w') as csv_file:
         # initialize the writer
-        my_writer = csv.write(csv_file)
+        my_writer = csv.writer(csv_file)
         # write the column names
         my_writer.writerow(['AUC', 'Sensitivity'])
         # write the values
