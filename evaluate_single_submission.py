@@ -5,7 +5,7 @@ import csv
 
 from os import path, makedirs
 
-from evaluation_metrics import evaluation_metrics_for_segmentation
+from evaluation_metrics import evaluation_metrics_for_segmentation, evaluation_metrics_for_classification
 from util.file_management import parse_boolean
 
 
@@ -30,7 +30,7 @@ def evaluate_single_submission(results_folder, gt_folder, output_path=None, expo
 
     # prepare the segmentation folder
     segmentation_folder = path.join(results_folder, 'segmentation')
-    # prepare the gt labels folder
+    # prepare the gt labels folder for segmentation
     gt_segmentation_folder = path.join(gt_folder, 'Disc_Cup_Masks')
 
     # evaluate the segmentation results
@@ -41,8 +41,25 @@ def evaluate_single_submission(results_folder, gt_folder, output_path=None, expo
     # initialize a tuple with all the results for segmentation
     segmentation_performance = [ mean_cup_dice, mean_disc_dice, mae_cdr ]
 
-    # return all the results
-    return segmentation_performance
+
+    # evaluate the classification results -----------------
+
+    # prepare the path to the classification results
+    classification_filename = path.join(results_folder, 'classification_results.csv')
+    # prepare the gt labels folder for classification
+    if is_training:
+        gt_classification_folder = gt_segmentation_folder
+    else:
+        gt_classification_folder = gt_folder
+    # get the AUC and the reference sensitivity values
+    auc, reference_sensitivity = evaluation_metrics_for_classification.evaluate_classification_results(classification_filename, gt_classification_folder, 
+                                                                                                       output_path=output_path,
+                                                                                                       is_training=is_training)
+    # initialize a tuple with all the results for classification
+    classification_performance = [ auc, reference_sensitivity ]
+
+
+    return segmentation_performance, classification_performance
 
 
 
