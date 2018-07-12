@@ -1,6 +1,8 @@
 
 import csv
 
+import numpy as np
+
 from os import path, makedirs
 
 from evaluation_metrics import evaluation_metrics_for_segmentation, evaluation_metrics_for_classification, evaluation_metrics_for_fovea_location
@@ -28,44 +30,60 @@ def evaluate_single_submission(results_folder, gt_folder, output_path=None, expo
 
     # prepare the segmentation folder
     segmentation_folder = path.join(results_folder, 'segmentation')
-    # prepare the gt labels folder for segmentation
-    gt_segmentation_folder = path.join(gt_folder, 'Disc_Cup_Masks')
+    
+    # check if there are segmentation results
+    if path.exists(segmentation_folder):
+        # prepare the gt labels folder for segmentation
+        gt_segmentation_folder = path.join(gt_folder, 'Disc_Cup_Masks')
 
-    # evaluate the segmentation results
-    mean_cup_dice, mean_disc_dice, mae_cdr = evaluation_metrics_for_segmentation.evaluate_segmentation_results(segmentation_folder, gt_segmentation_folder, 
-                                                                                                               output_path=output_path, 
-                                                                                                               export_table=export_table,
-                                                                                                               is_training=is_training)
-    # initialize a tuple with all the results for segmentation
-    segmentation_performance = [ mean_cup_dice, mean_disc_dice, mae_cdr ]
+        # evaluate the segmentation results
+        mean_cup_dice, mean_disc_dice, mae_cdr = evaluation_metrics_for_segmentation.evaluate_segmentation_results(segmentation_folder, gt_segmentation_folder, 
+                                                                                                                output_path=output_path, 
+                                                                                                                export_table=export_table,
+                                                                                                                is_training=is_training)
+        # initialize a tuple with all the results for segmentation
+        segmentation_performance = [ mean_cup_dice, mean_disc_dice, mae_cdr ]
+    else:
+        segmentation_performance = [ np.nan, np.nan, np.nan ]
 
 
     # evaluate the classification results -----------------
 
     # prepare the path to the classification results
     classification_filename = path.join(results_folder, 'classification_results.csv')
-    # prepare the gt labels folder for classification
-    if is_training:
-        gt_classification_folder = gt_segmentation_folder
+
+    # check if there are classification results
+    if path.exists(classification_filename):
+        # prepare the gt labels folder for classification
+        if is_training:
+            gt_classification_folder = path.join(gt_folder, 'Disc_Cup_Masks')
+        else:
+            gt_classification_folder = gt_folder
+        # get the AUC and the reference sensitivity values
+        auc, reference_sensitivity = evaluation_metrics_for_classification.evaluate_classification_results(classification_filename, gt_classification_folder, 
+                                                                                                        output_path=output_path,
+                                                                                                        is_training=is_training)
+        # initialize a tuple with all the results for classification
+        classification_performance = [ auc, reference_sensitivity ]
     else:
-        gt_classification_folder = gt_folder
-    # get the AUC and the reference sensitivity values
-    auc, reference_sensitivity = evaluation_metrics_for_classification.evaluate_classification_results(classification_filename, gt_classification_folder, 
-                                                                                                       output_path=output_path,
-                                                                                                       is_training=is_training)
-    # initialize a tuple with all the results for classification
-    classification_performance = [ auc, reference_sensitivity ]
+        classification_performance = [ np.nan, np.nan ]
 
 
     # evaluate the fovea location results -----------------
 
     # prepare the path to the fovea location results
     fovea_location_filename = path.join(results_folder, 'fovea_location_results.csv')
-    # prepare the filename to the fovea location gt
-    gt_filename = path.join(gt_folder, 'Fovea_location.xlsx')
-    # get the mean euclidean distance
-    fovea_location_performance = evaluation_metrics_for_fovea_location.evaluate_fovea_location_results(fovea_location_filename, gt_filename,
-                                                                                                       output_path=output_path)
+
+    # check if there are fovea location results
+    if path.exists(fovea_location_filename):
+        # prepare the filename to the fovea location gt
+        gt_filename = path.join(gt_folder, 'Fovea_location.xlsx')
+        # get the mean euclidean distance
+        fovea_location_performance = evaluation_metrics_for_fovea_location.evaluate_fovea_location_results(fovea_location_filename, gt_filename,
+                                                                                                        output_path=output_path)
+    else:
+        fovea_location_performance = np.nan
+
 
     return segmentation_performance, classification_performance, fovea_location_performance
 

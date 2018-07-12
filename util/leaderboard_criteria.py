@@ -16,6 +16,13 @@ def segmentation_leaderboard(metrics, teams, results):
         header: the names for the 4 columns
     '''
 
+    # identify indices of elements with NaNs
+    idx = np.where(np.logical_not(np.isnan(results[:,metrics.index('Mean optic cup Dice')])))[0]
+    # delete them from teams
+    teams = np.asarray(teams)[idx]
+    # delete rows
+    results = results[idx,:]
+
     # rank for each segmentation metric
     ranking_for_optic_cup, _ = best_is_highest(metrics, results, 'Mean optic cup Dice')
     ranking_for_optic_disc, _ = best_is_highest(metrics, results, 'Mean optic disc Dice')
@@ -57,6 +64,13 @@ def classification_leaderboard(metrics, teams, results):
         header: the names for the 2 columns
     '''
 
+    # identify indices of elements with NaNs
+    idx = np.where(np.logical_not(np.isnan(results[:,metrics.index('AUC')])))[0]
+    # delete them from teams
+    teams = np.asarray(teams)[idx]
+    # delete rows
+    results = results[idx,:]
+
     # rank for the auc
     sorted_indices, scores = best_is_highest(metrics, results, 'AUC')
 
@@ -80,6 +94,13 @@ def fovea_location_leaderboard(metrics, teams, results):
         scores: a numpy array with the Euclidean distances to the gt fovea sorted in descending order
         header: the names for the 2 columns
     '''
+
+    # identify indices of elements with NaNs
+    idx = np.where(np.logical_not(np.isnan(results[:,metrics.index('Mean Euclidean distance')])))[0]
+    # delete them from teams
+    teams = np.asarray(teams)[idx]
+    # delete rows
+    results = results[idx,:]
 
     # rank for the auc
     sorted_indices, scores = best_is_lowest(metrics, results, 'Mean Euclidean distance')
