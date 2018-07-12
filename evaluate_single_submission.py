@@ -5,7 +5,7 @@ import csv
 
 from os import path, makedirs
 
-from evaluation_metrics import evaluation_metrics_for_segmentation, evaluation_metrics_for_classification
+from evaluation_metrics import evaluation_metrics_for_segmentation, evaluation_metrics_for_classification, evaluation_metrics_for_fovea_location
 from util.file_management import parse_boolean
 
 
@@ -59,7 +59,17 @@ def evaluate_single_submission(results_folder, gt_folder, output_path=None, expo
     classification_performance = [ auc, reference_sensitivity ]
 
 
-    return segmentation_performance, classification_performance
+    # evaluate the fovea location results -----------------
+
+    # prepare the path to the fovea location results
+    fovea_location_filename = path.join(results_folder, 'fovea_location_results.csv')
+    # prepare the filename to the fovea location gt
+    gt_filename = path.join(gt_folder, 'Fovea_location.xlsx')
+    # get the mean euclidean distance
+    fovea_location_performance = evaluation_metrics_for_fovea_location.evaluate_fovea_location_results(fovea_location_filename, gt_filename,
+                                                                                                       output_path=output_path)
+
+    return segmentation_performance, classification_performance, fovea_location_performance
 
 
 

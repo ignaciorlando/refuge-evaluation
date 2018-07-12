@@ -95,6 +95,31 @@ def sort_scores_by_filename(target_names, names_to_sort, values_to_sort):
 
 
 
+def sort_coordinates_by_filename(target_names, names_to_sort, values_to_sort):
+    '''
+    This function is intended to correct the ordering in the outputs, just in case...
+
+    Input:
+        target_names: a list of names sorted in the order that we want
+        names_to_sort: a list of names to sort
+        values_to_sort: a numpy array of values to sort
+    Output:
+        sorted_values: same array than values_to_sort, but this time sorted :)
+    '''
+
+    # initialize the array of sorted values
+    sorted_values = np.zeros(values_to_sort.shape)
+
+    # iterate for each filename in the target names
+    for i in range(len(target_names)):
+        # assign the value to the correct position in the array
+        sorted_values[i,:] = values_to_sort[names_to_sort.index(target_names[i])]
+    
+    # return the sorted values
+    return sorted_values
+
+
+
 def get_labels_from_training_data(gt_folder):
     '''
     Since the training data has two folder, "Glaucoma" and "Non-Glaucoma", we can use
@@ -164,6 +189,26 @@ def save_csv_classification_performance(output_filename, auc, reference_sensitiv
 
 
 
+def save_csv_fovea_location_performance(output_filename, distance):
+    '''
+    Save the mean Euclidean distance on a CSV file
+
+    Input:
+        output_filename: a string with the full path and the output file name (with .csv extension)
+        distance: mean Euclidean distance
+    '''
+
+    # open the file
+    with open(output_filename, 'w') as csv_file:
+        # initialize the writer
+        my_writer = csv.writer(csv_file)
+        # write the column names
+        my_writer.writerow(['Mean Euclidean distance'])
+        # write the values
+        my_writer.writerow([str(distance)])
+
+
+
 def save_csv_segmentation_table(table_filename, image_filenames, cup_dices, disc_dices, ae_cdrs):
     '''
     Save the table of segmentation results as a CSV file.
@@ -188,6 +233,28 @@ def save_csv_segmentation_table(table_filename, image_filenames, cup_dices, disc
 
 
 
+def save_csv_fovea_location_table(table_filename, image_filenames, distances):
+    '''
+    Save the table of Euclidean distances results as a CSV file.
+
+    Input:
+        table_filename: a string with the full path and the table filename (with .csv extension)
+        image_filenames: a list of strings with the names of the images
+        distances: a 1D numpy array with the Euclidean distances of the prediction, for each image
+    '''
+
+    # write the data
+    with open(table_filename, 'w') as csv_file:
+        # initialize the writer
+        table_writer = csv.writer(csv_file)
+        # write the column names
+        table_writer.writerow(['Filename', 'Euclidean distance'])
+        # write each row
+        for i in range(len(image_filenames)):
+            table_writer.writerow( [image_filenames[i], str(distances[i])] )
+
+
+
 def save_csv_mean_segmentation_performance(output_filename, mean_cup_dice, mean_disc_dice, mae_cdrs):
     '''
     Save a CSV file with the mean performance
@@ -207,3 +274,77 @@ def save_csv_mean_segmentation_performance(output_filename, mean_cup_dice, mean_
         table_writer.writerow(['Cup-Dice', 'Disc-Dice', 'AE-CDR'])
         # write each row
         table_writer.writerow( [ str(mean_cup_dice), str(mean_disc_dice), str(mae_cdrs)] )
+
+
+
+def read_fovea_location_results(csv_filename):
+    '''
+    Read a CSV file with 3 columns: the first contains the filenames, and the second/third have
+    the (x,y) coordinates, respectively.
+
+    Input:
+        csv_filename: full path and filename to a three columns CSV file with the fovea location results (image filename, x, y)
+    Output:
+        image_filenames: list of image filenames, as retrieved from the first column of the CSV file
+        coordinates: a 2D numpy array of coordinates
+    '''
+
+    # initialize the output variables
+    image_filenames = []
+    coordinates = None
+
+    # open the file
+    with open(csv_filename, 'r') as csv_file:
+        # initialize a reader
+        csv_reader = csv.reader(csv_file)
+        # ignore the first row, that only has the header
+        next(csv_reader)
+        # and now, iterate and fill the arrays
+        for row in csv_reader:
+            # append the filename
+            image_filenames = image_filenames + [ row[0] ]
+            # append the coordinates
+            current_coordinates = np.asarray( row[1:], dtype=np.int )
+            if coordinates is None:
+                coordinates = current_coordinates
+            else:
+                coordinates = np.vstack( (coordinates, current_coordinates))
+
+    return image_filenames, coordinates
+
+
+
+import openpyxl
+
+def read_gt_fovea_location(xlsx_filename):
+    '''
+    Read a XLSX file with 3 columns: the first contains the filenames, and the second/third have
+    the (x,y) coordinates, respectively.
+
+    Input:
+        xlsx_filename: full path and filename to a three columns XLSX file with the fovea location results (image filename, x, y)
+    Output:
+        image_filenames: list of image filenames, as retrieved from the first column of the CSV file
+        coordinates: a 2D numpy array of coordinates
+    '''
+
+    # initialize the output variables
+    image_filenames = []
+    coordinates = None
+
+    # read the xlsx file
+    book = openpyxl.load_workbook(xlsx_filename)
+    current_sheet = book.active
+
+    # iterate for each row
+    for row in current_sheet.iter_rows(min_row=2, min_col=1):
+        # append the filename
+        image_filenames = image_filenames + [ row[0].value ]
+        # append the coordinates
+        current_coordinates = np.asarray( [ row[1].value, row[2].value ], dtype=np.int )
+        if coordinates is None:
+            coordinates = current_coordinates
+        else:
+            coordinates = np.vstack( (coordinates, current_coordinates))
+
+    return image_filenames, coordinates
