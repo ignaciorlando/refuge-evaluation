@@ -304,7 +304,7 @@ def read_fovea_location_results(csv_filename):
             # append the filename
             image_filenames = image_filenames + [ row[0] ]
             # append the coordinates
-            current_coordinates = np.asarray( row[1:], dtype=np.int )
+            current_coordinates = np.asarray( row[1:], dtype=np.float )
             if coordinates is None:
                 coordinates = current_coordinates
             else:
@@ -341,7 +341,7 @@ def read_gt_fovea_location(xlsx_filename):
         # append the filename
         image_filenames = image_filenames + [ row[1].value ]
         # append the coordinates
-        current_coordinates = np.asarray( [ row[2].value, row[3].value ], dtype=np.int )
+        current_coordinates = np.asarray( [ float(row[2].value), float(row[3].value) ], dtype=np.float )
         if coordinates is None:
             coordinates = current_coordinates
         else:
