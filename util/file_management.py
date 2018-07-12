@@ -400,3 +400,68 @@ def export_table_of_results(table_filename, team_names, segmentation_results, cl
             # write a row of results
             table_writer.writerow( [team_names[i], str(current_segmentation_results[0]), str(current_segmentation_results[1]), str(current_segmentation_results[2]),
                                     str(current_classification_results[0]), str(current_classification_results[1]), str(current_fovea_detection_results)] )
+
+
+
+def export_ranking(table_filename, header, team_names, scores):
+    '''
+    Export the ranking
+
+    Input:
+        table_filename: filename of the CSV file with the table of results
+        header: list of strings with the header for the output file
+        team_names: names of the teams evaluated
+        scores: a numpy array with ranking information
+    '''
+
+    # write the data
+    with open(table_filename, 'w') as csv_file:
+        # initialize the writer
+        table_writer = csv.writer(csv_file)
+        # write the column names
+        table_writer.writerow(header)
+        # write each row
+        for i in range(len(team_names)):
+            # write a row of results
+            if len(scores.shape) > 1:
+                table_writer.writerow( [ team_names[i] ] + scores[i,:].tolist() )
+            else:
+                table_writer.writerow( [ team_names[i] ] + [ scores[i] ] )
+
+
+
+def read_table_of_results(table_filename):
+    '''
+    Read the table of results (unsorted) as a CSV
+
+    Input:
+        table_filename: filename of the CSV file with the table of results
+    Output:
+        header: a list of strings with the name of the evaluation metrics
+        teams: a list of strings with the name of the teams
+        results: a numpy matrix of evaluation metrics
+    '''
+
+    # open the file
+    with open(table_filename, 'r') as csv_file:
+        # initialize the reader
+        csv_reader = csv.reader(csv_file)
+        # get the first row
+        header = next(csv_reader)[1:]
+
+        # initialize the list of teams
+        teams = []
+        # initialize a numpy matrix with all the other results
+        results = None
+        # and now, iterate and fill the arrays
+        for row in csv_reader:
+            # append the team name
+            teams = teams + [ row[0] ]
+            # append the results
+            current_results = np.asarray( row[1:], dtype=np.float )
+            if results is None:
+                results = current_results
+            else:
+                results = np.vstack( (results, current_results))
+
+    return header, teams, results
