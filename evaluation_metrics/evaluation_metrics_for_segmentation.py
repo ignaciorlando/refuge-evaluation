@@ -4,7 +4,7 @@ import numpy as np
 from scipy import misc
 from os import path, makedirs
 
-from util.file_management import get_segmentation_filenames, save_csv_mean_segmentation_performance, save_csv_segmentation_table
+from util.file_management import get_filenames, save_csv_mean_segmentation_performance, save_csv_segmentation_table
 
 
 
@@ -46,6 +46,7 @@ def dice_coefficient(binary_segmentation, binary_gt_label):
 def vertical_diameter(binary_segmentation):
     '''
     Get the vertical diameter from a binary segmentation.
+    The vertical diameter is defined as the "fattest" area of the binary_segmentation parameter.
 
     Input:
         binary_segmentation: a boolean 2D numpy array representing a region of interest.
@@ -223,7 +224,7 @@ def evaluate_segmentation_results(segmentation_folder, gt_folder, output_path=No
     '''
 
     # get all the image filenames
-    image_filenames = get_segmentation_filenames(segmentation_folder)
+    image_filenames = get_filenames(segmentation_folder, 'bmp')
     # create output path if it does not exist
     if not (output_path is None) and not (path.exists(output_path)):
         makedirs(output_path)

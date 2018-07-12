@@ -3,7 +3,7 @@ import csv
 import numpy as np
 
 from scipy.io import savemat
-from os import listdir, path
+from os import listdir, path, makedirs
 
 
 def parse_boolean(input_string):
@@ -14,12 +14,12 @@ def parse_boolean(input_string):
 
 
 
-def get_segmentation_filenames(path_to_files, extension='bmp'):
+def get_filenames(path_to_files, extension):
     '''
     Get all the files on a given folder with the given extension
 
     Input:
-        path_to_files: string to a path where the segmentation files are
+        path_to_files: string to a path where the files are
         [extension]: string representing the extension of the files
     Output:
         image_filenames: a list of strings with the filenames in the folder
@@ -348,3 +348,25 @@ def read_gt_fovea_location(xlsx_filename):
             coordinates = np.vstack( (coordinates, current_coordinates))
 
     return image_filenames, coordinates
+
+
+
+    import zipfile
+
+    def unzip_submission(submission_file, output_folder):
+        '''
+        Unzip a .ZIP file with a submission to REFUGE from a team
+
+        Input:
+            submission_file: full path and filename of the .zip file
+            output_folder: folder where the output will be saved
+        '''
+
+        # initialize the output folder
+        if not path.exists(output_folder):
+            makedirs(output_folder)
+
+        # open the zip file
+        zip_ref = zipfile.ZipFile(submission_file, 'r')
+        zip_ref.extractall(output_folder)
+        zip_ref.close()
