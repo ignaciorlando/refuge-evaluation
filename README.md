@@ -1,5 +1,5 @@
 
-![Logo](http://optimaxeonsmall.augen.meduniwien.ac.at:8080/jorlando/refuge-evaluation/blob/master/logo_refuge_header.png)
+![Logo](https://optimaxeonsmall.augen.meduniwien.ac.at:8080/jorlando/refuge-evaluation/blob/master/logo_refuge_header.png)
 
 # REFUGE Challenge - Evaluation
 
