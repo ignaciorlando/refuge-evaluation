@@ -1,6 +1,4 @@
 
-import argparse
-import sys
 import csv
 
 from os import path, makedirs
@@ -73,7 +71,8 @@ def evaluate_single_submission(results_folder, gt_folder, output_path=None, expo
 
 
 
-
+import argparse
+import sys
 
 if __name__ == '__main__':
 

@@ -138,8 +138,8 @@ def get_labels_from_training_data(gt_folder):
     non_glaucoma_folder = path.join(gt_folder, 'Non-Glaucoma')
 
     # get all the filenames inside each folder
-    glaucoma_filenames = get_segmentation_filenames(glaucoma_folder)
-    non_glaucoma_filenames = get_segmentation_filenames(non_glaucoma_folder)
+    glaucoma_filenames = get_filenames(glaucoma_folder, 'bmp')
+    non_glaucoma_filenames = get_filenames(non_glaucoma_folder, 'bmp')
 
     # concatenate them to generate the array of image filenames
     image_filenames = glaucoma_filenames + non_glaucoma_filenames
@@ -351,22 +351,52 @@ def read_gt_fovea_location(xlsx_filename):
 
 
 
-    import zipfile
+import zipfile
 
-    def unzip_submission(submission_file, output_folder):
-        '''
-        Unzip a .ZIP file with a submission to REFUGE from a team
+def unzip_submission(submission_file, output_folder):
+    '''
+    Unzip a .ZIP file with a submission to REFUGE from a team
 
-        Input:
-            submission_file: full path and filename of the .zip file
-            output_folder: folder where the output will be saved
-        '''
+    Input:
+        submission_file: full path and filename of the .zip file
+        output_folder: folder where the output will be saved
+    '''
 
-        # initialize the output folder
-        if not path.exists(output_folder):
-            makedirs(output_folder)
+    # initialize the output folder
+    if not path.exists(output_folder):
+        makedirs(output_folder)
 
-        # open the zip file
-        zip_ref = zipfile.ZipFile(submission_file, 'r')
-        zip_ref.extractall(output_folder)
-        zip_ref.close()
+    # open the zip file
+    zip_ref = zipfile.ZipFile(submission_file, 'r')
+    zip_ref.extractall(output_folder)
+    zip_ref.close()
+
+
+
+def export_table_of_results(table_filename, team_names, segmentation_results, classification_results, fovea_detection_results):
+    '''
+    Export a table of results (unsorted) as a CSV
+
+    Input:
+        table_filename: filename of the CSV file with the table of results
+        team_names: names of the teams evaluated
+        segmentation_results: list of segmentation results
+        classification_results: list of classification results
+        fovea_detection_results: list of fovea detection results
+    '''
+
+    # write the data
+    with open(table_filename, 'w') as csv_file:
+        # initialize the writer
+        table_writer = csv.writer(csv_file)
+        # write the column names
+        table_writer.writerow(['Team name', 'Mean optic cup Dice', 'Mean optic disc Dice', 'MAE cup to disc ratio', 'AUC', 'Reference Sensitivity', 'Mean Euclidean distance'])
+        # write each row
+        for i in range(len(team_names)):
+            # retrieve current results
+            current_segmentation_results = segmentation_results[i]
+            current_classification_results = classification_results[i]
+            current_fovea_detection_results = fovea_detection_results[i]
+            # write a row of results
+            table_writer.writerow( [team_names[i], str(current_segmentation_results[0]), str(current_segmentation_results[1]), str(current_segmentation_results[2]),
+                                    str(current_classification_results[0]), str(current_classification_results[1]), str(current_fovea_detection_results)] )
