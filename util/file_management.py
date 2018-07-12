@@ -339,9 +339,9 @@ def read_gt_fovea_location(xlsx_filename):
     # iterate for each row
     for row in current_sheet.iter_rows(min_row=2, min_col=1):
         # append the filename
-        image_filenames = image_filenames + [ row[0].value ]
+        image_filenames = image_filenames + [ row[1].value ]
         # append the coordinates
-        current_coordinates = np.asarray( [ row[1].value, row[2].value ], dtype=np.int )
+        current_coordinates = np.asarray( [ row[2].value, row[3].value ], dtype=np.int )
         if coordinates is None:
             coordinates = current_coordinates
         else:
