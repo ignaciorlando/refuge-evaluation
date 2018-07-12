@@ -18,10 +18,17 @@ The following libraries are also used:
 
 ## Usage
 
-In this section we explain how to use our code.
+In this section we explain how to use the code.
 
 ### Evaluate a single submission
 
+To evaluate a single submission, use the script ```evaluate_single_submission.py```.
+
 ### Evaluate multiple submission
 
+To evaluate multiple submissions, use the script ```evaluate_multiple_submission.py```.
+
 ### Generate leaderboards
+
+To generate the leaderboards for the challenge, use the script ```generate_leaderboards.py```.
+Make sure that you have executed ```evaluate_multiple_submission.py``` first, because you need to provide the table of results produce by that script.
