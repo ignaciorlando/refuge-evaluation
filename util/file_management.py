@@ -454,6 +454,8 @@ def export_ranking(table_filename, header, team_names, scores):
         scores: a numpy array with ranking information
     '''
 
+    scores = np.asarray(scores)
+
     # write the data
     with open(table_filename, 'w') as csv_file:
         # initialize the writer

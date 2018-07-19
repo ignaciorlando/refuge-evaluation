@@ -24,24 +24,32 @@ def segmentation_leaderboard(metrics, teams, results):
     results = results[idx,:]
 
     # rank for each segmentation metric
-    ranking_for_optic_cup, sorted_optic_cup_dice = best_is_highest(metrics, results, 'Mean optic cup Dice')
-    ranking_for_optic_disc, sorted_optic_disc_dice = best_is_highest(metrics, results, 'Mean optic disc Dice')
-    ranking_for_cup_to_disc_ratio, sorted_cdr = best_is_lowest(metrics, results, 'MAE cup to disc ratio')
+    ranking_for_optic_cup, _ = best_is_highest(metrics, results, 'Mean optic cup Dice')
+    ranking_for_optic_disc, _ = best_is_highest(metrics, results, 'Mean optic disc Dice')
+    ranking_for_cup_to_disc_ratio, _ = best_is_lowest(metrics, results, 'MAE cup to disc ratio')
 
     # sum all the rankings and rank as the best the one with the highest sum
-    scores = (np.asarray(ranking_for_optic_cup) + np.asarray(ranking_for_optic_disc) + np.asarray(ranking_for_cup_to_disc_ratio)).tolist()
-    sorted_indices = list((np.argsort(scores)))
+    scores = np.zeros(len(ranking_for_optic_cup))
+    for i in range(0, len(teams)):
+        scores[i] = ranking_for_optic_cup.index(i) + ranking_for_optic_disc.index(i) + ranking_for_cup_to_disc_ratio.index(i)
+    sorted_indices = list((np.argsort(scores.tolist())))
 
     # sort everything
     teams = np.asarray(teams, dtype=np.str)[sorted_indices].tolist()
+
     scores = np.asarray(scores)[sorted_indices]
+
     ranking_for_optic_cup = np.asarray(ranking_for_optic_cup)[sorted_indices]
     ranking_for_optic_disc = np.asarray(ranking_for_optic_disc)[sorted_indices]
     ranking_for_cup_to_disc_ratio = np.asarray(ranking_for_cup_to_disc_ratio)[sorted_indices]
 
+    sorted_optic_cup_dice = np.asarray(get_metric(metrics, results, 'Mean optic cup Dice'))[sorted_indices]
+    sorted_optic_disc_dice = np.asarray(get_metric(metrics, results, 'Mean optic disc Dice'))[sorted_indices]
+    sorted_cdr = np.asarray(get_metric(metrics, results, 'MAE cup to disc ratio'))[sorted_indices]
+
     # join all the scores in a single matrix
     all_scores = np.zeros( (len(teams), 7) )
-    all_scores[:,0] = scores
+    all_scores[:,0] = scores+1
     all_scores[:,1] = ranking_for_optic_cup+1
     all_scores[:,2] = ranking_for_optic_disc+1
     all_scores[:,3] = ranking_for_cup_to_disc_ratio+1
@@ -115,6 +123,21 @@ def fovea_location_leaderboard(metrics, teams, results):
     
 
 
+def get_metric(metrics, results, selected_metric):
+    '''
+    Retrieve the selected metric from a table of results
+
+    Input:
+        metrics: a list of the metrics in results, in the same order than the columns of results
+        results: a 2D numpy matrix with all the evaluation metrics
+        selected_metric: a string representing the selected metric
+    Output:
+        metric: a column vector with the selected metric
+    '''
+
+    return results[:,metrics.index(selected_metric)]
+
+
 def best_is_lowest(metrics, results, selected_metric):
     '''
     Get a list of indices to sort the teams according to a given metric, considering that
@@ -130,7 +153,7 @@ def best_is_lowest(metrics, results, selected_metric):
     '''
 
     # get the values of the metric to sort
-    metric_to_sort = results[:,metrics.index(selected_metric)]
+    metric_to_sort = get_metric(metrics, results, selected_metric)
 
     # get the sorted indices
     sorted_indices = np.argsort(metric_to_sort).tolist()
@@ -153,16 +176,14 @@ def best_is_highest(metrics, results, selected_metric):
     Output:
         sorted_indices: indices sorted in descending order
         sorted_metric: a numpy array with the evaluation metric used for sorting, sorted
+        unsorted_metric: a numpy array with the evaluation metric as retrieved, without being sorted
     '''
 
     # sort it in ascending order
-    sorted_indices, _ = best_is_lowest(metrics, results, selected_metric)
+    sorted_indices, sorted_metric = best_is_lowest(metrics, results, selected_metric)
     # invert the indices
     sorted_indices = list(reversed(sorted_indices))
-
-    # get the values of the metric to sort
-    metric_to_sort = results[:,metrics.index(selected_metric)]
-    # sort the metric
-    sorted_metric = metric_to_sort[sorted_indices]
+    # invert the order of the metrics
+    sorted_metric = list(reversed(sorted_metric))
     
     return sorted_indices, sorted_metric
