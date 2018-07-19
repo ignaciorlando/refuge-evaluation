@@ -9,7 +9,7 @@ from evaluation_metrics import evaluation_metrics_for_segmentation, evaluation_m
 from util.file_management import parse_boolean
 
 
-def evaluate_single_submission(results_folder, gt_folder, output_path=None, export_table=False, is_training=False):
+def evaluate_single_submission(results_folder, gt_folder, output_path=None, export_table=False, is_training=False, team_name=None):
     '''
     Evaluate the results of a single submission
 
@@ -19,6 +19,7 @@ def evaluate_single_submission(results_folder, gt_folder, output_path=None, expo
         [output_path]: a folder where the results will be saved. If not provided, the results are not saved
         [export_table]: a boolean value indicating if the table will be exported or not
         [is_training]: a boolean value indicating if the evaluation is performed on training data or not
+        [team_name]: name of the team, it could be used in case of a wrong organization of the folders
     Output:
         mean_cup_dice: the mean Dice coefficient for the optic cups
         mean_disc_dice: the mean Dice coefficient for the optic disc
@@ -26,13 +27,22 @@ def evaluate_single_submission(results_folder, gt_folder, output_path=None, expo
 
     '''
 
+    # correct results folder in case of a wrong organization of the folders
+    if not (team_name is None):
+        if ( ( not (path.exists(path.join(results_folder, 'segmentation'))) and path.exists(path.join(results_folder, team_name, 'segmentation')) ) or 
+             ( not (path.exists(path.join(results_folder, 'classification_results.csv'))) and path.exists(path.join(results_folder, team_name, 'classification_results.csv')) ) or 
+             ( not (path.exists(path.join(results_folder, 'fovea_location_results.csv'))) and path.exists(path.join(results_folder, team_name, 'fovea_location_results.csv')) ) ):
+            results_folder = path.join(results_folder, team_name)
+
     # evaluate the segmentation results -----------------
 
     # prepare the segmentation folder
     segmentation_folder = path.join(results_folder, 'segmentation')
-    
+    print(segmentation_folder)
+
     # check if there are segmentation results
     if path.exists(segmentation_folder):
+        print('> Evaluating segmentation results')
         # prepare the gt labels folder for segmentation
         gt_segmentation_folder = path.join(gt_folder, 'Disc_Cup_Masks')
 
@@ -54,6 +64,7 @@ def evaluate_single_submission(results_folder, gt_folder, output_path=None, expo
 
     # check if there are classification results
     if path.exists(classification_filename):
+        print('> Evaluating classification results')
         # prepare the gt labels folder for classification
         if is_training:
             gt_classification_folder = path.join(gt_folder, 'Disc_Cup_Masks')
@@ -76,6 +87,7 @@ def evaluate_single_submission(results_folder, gt_folder, output_path=None, expo
 
     # check if there are fovea location results
     if path.exists(fovea_location_filename):
+        print('> Evaluating fovea location results')
         # prepare the filename to the fovea location gt
         gt_filename = path.join(gt_folder, 'Fovea_location.xlsx')
         # get the mean euclidean distance

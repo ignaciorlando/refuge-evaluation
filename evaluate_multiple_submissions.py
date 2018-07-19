@@ -38,15 +38,16 @@ def evaluate_multiple_submissions(submissions_folder, gt_folder, uncompressed_fi
         print('\n' + current_team_name)
         print('-------------------------------')
         # generate a new output path for the current submission
-        current_results_folder = uncompressed_files_folder
+        current_results_folder = path.join(uncompressed_files_folder, current_team_name)
+        if not path.exists(current_results_folder):
+            makedirs(current_results_folder)
         
         # unzip the submission
         unzip_submission(path.join(submissions_folder, submission_files[i]), current_results_folder)
 
         # get current results
-        current_results_folder = path.join(current_results_folder, current_team_name)
         current_segmentation_perf, current_classification_perf, current_fovea_location_perf = evaluate_single_submission(current_results_folder, gt_folder, 
-                                                                                                                         output_path=current_results_folder, export_table=True, is_training=is_training)
+                                                                                                                         output_path=current_results_folder, export_table=True, is_training=is_training, team_name=current_team_name)
 
         # attach everything to the arrays
         teams = teams + [ current_team_name ]

@@ -7,6 +7,7 @@ from os import path, makedirs
 from util.file_management import get_filenames, save_csv_mean_segmentation_performance, save_csv_segmentation_table
 
 
+EPS = 1e-7
 
 
 def dice_coefficient(binary_segmentation, binary_gt_label):
@@ -84,7 +85,7 @@ def vertical_cup_to_disc_ratio(segmentation):
     # compute the disc diameter
     disc_diameter = vertical_diameter(segmentation<255)
 
-    return cup_diameter / disc_diameter
+    return cup_diameter / (disc_diameter + EPS)
 
 
 

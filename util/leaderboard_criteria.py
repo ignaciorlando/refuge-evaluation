@@ -30,7 +30,7 @@ def segmentation_leaderboard(metrics, teams, results):
 
     # sum all the rankings and rank as the best the one with the highest sum
     scores = (np.asarray(ranking_for_optic_cup) + np.asarray(ranking_for_optic_disc) + np.asarray(ranking_for_cup_to_disc_ratio)).tolist()
-    sorted_indices = list(reversed(np.argsort(scores)))
+    sorted_indices = list((np.argsort(scores)))
 
     # sort everything
     teams = np.asarray(teams, dtype=np.str)[sorted_indices].tolist()

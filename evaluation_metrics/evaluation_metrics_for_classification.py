@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from util.file_management import read_csv_classification_results, sort_scores_by_filename, get_labels_from_training_data, save_roc_curve, save_csv_classification_performance
+from util.file_management import read_csv_classification_results, sort_scores_by_filename, get_labels_from_training_data, save_roc_curve, save_csv_classification_performance, read_gt_labels
 
 from sklearn.metrics import roc_auc_score, roc_curve
 from os import path, makedirs
@@ -67,15 +67,14 @@ def evaluate_classification_results(prediction_filename, gt_folder, output_path=
 
     # we will treat differently the labels from the training set
     if is_training:
-
         # we will use the gt folder to retrieve the glaucomatous and no-glaucomatous cases
         gt_filenames, gt_labels = get_labels_from_training_data(gt_folder)
-        # sort the gt filenames using the same order as predicted
-        gt_labels = sort_scores_by_filename(image_filenames, gt_filenames, gt_labels)
-
     else:
-
-        print('Not implemented yet')
+        # get the filenames and the labels
+        gt_filenames, gt_labels = read_gt_labels(path.join(gt_folder, 'GT.xlsx'))
+    
+    # sort the gt filenames using the same order as predicted
+    gt_labels = sort_scores_by_filename(image_filenames, gt_filenames, gt_labels)
     
     # compute the ROC curve
     sensitivity, fpr, auc = get_roc_curve(predicted_scores, gt_labels)

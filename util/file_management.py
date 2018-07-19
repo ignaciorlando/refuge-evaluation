@@ -82,13 +82,15 @@ def sort_scores_by_filename(target_names, names_to_sort, values_to_sort):
         sorted_values: same array than values_to_sort, but this time sorted :)
     '''
 
+    names_to_sort = [x.upper() for x in names_to_sort]
+
     # initialize the array of sorted values
     sorted_values = np.zeros(values_to_sort.shape)
 
     # iterate for each filename in the target names
     for i in range(len(target_names)):
         # assign the value to the correct position in the array
-        sorted_values[i] = values_to_sort[names_to_sort.index(target_names[i])]
+        sorted_values[i] = values_to_sort[names_to_sort.index(target_names[i].upper())]
     
     # return the sorted values
     return sorted_values
@@ -348,6 +350,44 @@ def read_gt_fovea_location(xlsx_filename):
             coordinates = np.vstack( (coordinates, current_coordinates))
 
     return image_filenames, coordinates
+
+
+
+import openpyxl
+
+def read_gt_labels(xlsx_filename):
+    '''
+    Read a XLSX file with 2 columns: the first contains the filenames, and the second/third have
+    the binary label for glaucoma (1) / healthy (0).
+
+    Input:
+        xlsx_filename: full path and filename to a three columns XLSX file with the fovea location results (image filename, x, y)
+    Output:
+        image_filenames: list of image filenames, as retrieved from the first column of the CSV file
+        labels: a 2D numpy array of coordinates
+    '''
+
+    # initialize the output variables
+    image_filenames = []
+    labels = None
+
+    # read the xlsx file
+    book = openpyxl.load_workbook(xlsx_filename)
+    current_sheet = book.active
+
+    # iterate for each row
+    for row in current_sheet.iter_rows(min_row=2, min_col=1):
+        # append the filename
+        current_name = row[0].value[:-3]  + 'jpg'
+        image_filenames = image_filenames + [ current_name ]
+        # append the coordinates
+        current_label = row[1].value > 0
+        if labels is None:
+            labels = current_label
+        else:
+            labels = np.vstack( (labels, current_label))
+
+    return image_filenames, labels
 
 
 
