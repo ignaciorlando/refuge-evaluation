@@ -226,6 +226,9 @@ def evaluate_segmentation_results(segmentation_folder, gt_folder, output_path=No
 
     # get all the image filenames
     image_filenames = get_filenames(segmentation_folder, 'bmp')
+    if len(image_filenames)==0:
+        print('** The segmentation folder does not include any bmp file. Check the files extension and resubmit your results.')
+        raise ValueError()
     # create output path if it does not exist
     if not (output_path is None) and not (path.exists(output_path)):
         makedirs(output_path)

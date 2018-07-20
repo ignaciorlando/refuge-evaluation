@@ -38,7 +38,6 @@ def evaluate_single_submission(results_folder, gt_folder, output_path=None, expo
 
     # prepare the segmentation folder
     segmentation_folder = path.join(results_folder, 'segmentation')
-    print(segmentation_folder)
 
     # check if there are segmentation results
     if path.exists(segmentation_folder):
