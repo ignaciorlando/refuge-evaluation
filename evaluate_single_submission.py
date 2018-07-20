@@ -47,12 +47,16 @@ def evaluate_single_submission(results_folder, gt_folder, output_path=None, expo
         gt_segmentation_folder = path.join(gt_folder, 'Disc_Cup_Masks')
 
         # evaluate the segmentation results
-        mean_cup_dice, mean_disc_dice, mae_cdr = evaluation_metrics_for_segmentation.evaluate_segmentation_results(segmentation_folder, gt_segmentation_folder, 
-                                                                                                                output_path=output_path, 
-                                                                                                                export_table=export_table,
-                                                                                                                is_training=is_training)
-        # initialize a tuple with all the results for segmentation
-        segmentation_performance = [ mean_cup_dice, mean_disc_dice, mae_cdr ]
+        try:
+            mean_cup_dice, mean_disc_dice, mae_cdr = evaluation_metrics_for_segmentation.evaluate_segmentation_results(segmentation_folder, gt_segmentation_folder, 
+                                                                                                                    output_path=output_path, 
+                                                                                                                    export_table=export_table,
+                                                                                                                    is_training=is_training)
+            # initialize a tuple with all the results for segmentation
+            segmentation_performance = [ mean_cup_dice, mean_disc_dice, mae_cdr ]
+        except:
+            print('> *** There was an error processing this submission. Please, check the format instructions!')
+            segmentation_performance = [ np.nan, np.nan, np.nan ]
     else:
         segmentation_performance = [ np.nan, np.nan, np.nan ]
 
@@ -71,11 +75,15 @@ def evaluate_single_submission(results_folder, gt_folder, output_path=None, expo
         else:
             gt_classification_folder = gt_folder
         # get the AUC and the reference sensitivity values
-        auc, reference_sensitivity = evaluation_metrics_for_classification.evaluate_classification_results(classification_filename, gt_classification_folder, 
-                                                                                                        output_path=output_path,
-                                                                                                        is_training=is_training)
-        # initialize a tuple with all the results for classification
-        classification_performance = [ auc, reference_sensitivity ]
+        try:
+            auc, reference_sensitivity = evaluation_metrics_for_classification.evaluate_classification_results(classification_filename, gt_classification_folder, 
+                                                                                                            output_path=output_path,
+                                                                                                            is_training=is_training)
+            # initialize a tuple with all the results for classification
+            classification_performance = [ auc, reference_sensitivity ]
+        except:
+            print('> *** There was an error processing this submission. Please, check the format instructions!')
+            classification_performance = [ np.nan, np.nan ]
     else:
         classification_performance = [ np.nan, np.nan ]
 
@@ -91,8 +99,12 @@ def evaluate_single_submission(results_folder, gt_folder, output_path=None, expo
         # prepare the filename to the fovea location gt
         gt_filename = path.join(gt_folder, 'Fovea_location.xlsx')
         # get the mean euclidean distance
-        fovea_location_performance = evaluation_metrics_for_fovea_location.evaluate_fovea_location_results(fovea_location_filename, gt_filename,
-                                                                                                        output_path=output_path)
+        try:
+            fovea_location_performance = evaluation_metrics_for_fovea_location.evaluate_fovea_location_results(fovea_location_filename, gt_filename,
+                                                                                                            output_path=output_path)
+        except:
+            print('> *** There was an error processing this submission. Please, check the format instructions!')
+            fovea_location_performance = np.nan
     else:
         fovea_location_performance = np.nan
 
