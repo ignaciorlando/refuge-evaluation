@@ -157,6 +157,8 @@ def generate_table_of_results(image_filenames, segmentation_folder, gt_folder, i
 
         # read the segmentation
         segmentation = misc.imread(path.join(segmentation_folder, image_filenames[i]))
+        if len(segmentation.shape) > 2:
+            segmentation = segmentation[:,:,0]
         # read the gt
         if is_training:
             gt_filename = path.join(gt_folder, 'Glaucoma', image_filenames[i])

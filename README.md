@@ -68,9 +68,25 @@ Make sure that you compress a folder with the name of your team, containing all 
 ### A folder inside the ZIP file
 If you have compressed a folder into a zip file instead of all the files, you will create a folder inside the zip file (e.g., in the BestTeam.zip file you have a folder named "BestTeamEver" instead of the segmentation folder, the classification_results.csv and the fovea_localization_results.csv files). Please, make sure that you are compressing the files and not the folder where the files are (e.g., select all the files, right clic, select "Compress" in Ubuntu).
 
-### CSV files without header
-The evaluation code for fovea detection / glaucoma classification takes .csv files as inputs. These files have to have a header identifying each of the columns (e.g. Filename, Glaucoma risk). Make sure that you are introducing these fields in the csv file before submitting!
-
 ### Segmentation images in the wrong format
 
 Make sure that your submission contains the segmentation masks in BMP format and not in TIFF or any other image file extension.
+
+### Segmentation files as RGB
+
+Although there is a patch in the code to deal with segmentation results that were saved as RGB files (with all the channels equal), please make sure that you export them in the correct way.
+
+### Segmentation folder without useless files
+
+The segmentation folder should not contain useless folders or files. Make sure that it only has the bmp files with the segmentations.
+
+### Size of the segmentation maps
+
+Deep neural networks usually need to downsize the images before processing. Make sure that your segmentation maps have the same size as the original images. Otherwise, the evaluation will not be possible!
+
+### CSV files without header
+The evaluation code for fovea detection / glaucoma classification takes .csv files as inputs. These files have to have a header identifying each of the columns (e.g. Filename, Glaucoma risk). Make sure that you are introducing these fields in the csv file before submitting!
+
+### CSV files that are unable to be read with Python
+Make sure that you generated the CSV file in 'utf-8' encoding. Otherwise, the python library will not be able to read the file.
+

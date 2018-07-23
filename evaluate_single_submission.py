@@ -29,6 +29,8 @@ def evaluate_single_submission(results_folder, gt_folder, output_path=None, expo
 
     # correct results folder in case of a wrong organization of the folders
     inside_results_folder = listdir(results_folder)
+    if '__MACOSX' in inside_results_folder: 
+        inside_results_folder.remove('__MACOSX')
     if ( ( not (path.exists(path.join(results_folder, 'segmentation'))) and path.exists(path.join(results_folder, inside_results_folder[0], 'segmentation')) ) or 
             ( not (path.exists(path.join(results_folder, 'classification_results.csv'))) and path.exists(path.join(results_folder, inside_results_folder[0], 'classification_results.csv')) ) or 
             ( not (path.exists(path.join(results_folder, 'fovea_location_results.csv'))) and path.exists(path.join(results_folder, inside_results_folder[0], 'fovea_location_results.csv')) ) ):
