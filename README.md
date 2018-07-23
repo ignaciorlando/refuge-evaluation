@@ -65,5 +65,8 @@ Make sure to use a .zip file and not .rar or any other compression format.
 ### ZIP file organization
 Make sure that you compress a folder with the name of your team, containing all the results that you want to evaluate, in the format provided in the website.
 
+### A folder inside the ZIP file
+If you have compressed a folder into a zip file instead of all the files, you will create a folder inside the zip file (e.g., in the BestTeam.zip file you have a folder named "BestTeamEver" instead of the segmentation folder, the classification_results.csv and the fovea_localization_results.csv files). Please, make sure that you are compressing the files and not the folder where the files are (e.g., select all the files, right clic, select "Compress" in Ubuntu).
+
 ### CSV files without header
 The evaluation code for fovea detection / glaucoma classification takes .csv files as inputs. These files have to have a header identifying each of the columns (e.g. Filename, Glaucoma risk). Make sure that you are introducing these fields in the csv file before submitting!

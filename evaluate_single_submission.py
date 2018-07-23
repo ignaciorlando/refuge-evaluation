@@ -3,7 +3,7 @@ import csv
 
 import numpy as np
 
-from os import path, makedirs
+from os import path, makedirs, listdir
 
 from evaluation_metrics import evaluation_metrics_for_segmentation, evaluation_metrics_for_classification, evaluation_metrics_for_fovea_location
 from util.file_management import parse_boolean
@@ -28,11 +28,11 @@ def evaluate_single_submission(results_folder, gt_folder, output_path=None, expo
     '''
 
     # correct results folder in case of a wrong organization of the folders
-    if not (team_name is None):
-        if ( ( not (path.exists(path.join(results_folder, 'segmentation'))) and path.exists(path.join(results_folder, team_name, 'segmentation')) ) or 
-             ( not (path.exists(path.join(results_folder, 'classification_results.csv'))) and path.exists(path.join(results_folder, team_name, 'classification_results.csv')) ) or 
-             ( not (path.exists(path.join(results_folder, 'fovea_location_results.csv'))) and path.exists(path.join(results_folder, team_name, 'fovea_location_results.csv')) ) ):
-            results_folder = path.join(results_folder, team_name)
+    inside_results_folder = listdir(results_folder)
+    if ( ( not (path.exists(path.join(results_folder, 'segmentation'))) and path.exists(path.join(results_folder, inside_results_folder[0], 'segmentation')) ) or 
+            ( not (path.exists(path.join(results_folder, 'classification_results.csv'))) and path.exists(path.join(results_folder, inside_results_folder[0], 'classification_results.csv')) ) or 
+            ( not (path.exists(path.join(results_folder, 'fovea_location_results.csv'))) and path.exists(path.join(results_folder, inside_results_folder[0], 'fovea_location_results.csv')) ) ):
+        results_folder = path.join(results_folder, inside_results_folder[0])
 
     # evaluate the segmentation results -----------------
 
