@@ -1,5 +1,5 @@
 
-![Logo](https://raw.githubusercontent.com/ignaciorlando/refuge-evaluation/blob/master/logo_refuge_header.png)
+![Logo](https://raw.githubusercontent.com/ignaciorlando/refuge-evaluation/master/logo_refuge_header.png)
 
 # REFUGE Challenge - Evaluation
 
