@@ -70,3 +70,7 @@ If you have compressed a folder into a zip file instead of all the files, you wi
 
 ### CSV files without header
 The evaluation code for fovea detection / glaucoma classification takes .csv files as inputs. These files have to have a header identifying each of the columns (e.g. Filename, Glaucoma risk). Make sure that you are introducing these fields in the csv file before submitting!
+
+### Segmentation images in the wrong format
+
+Make sure that your submission contains the segmentation masks in BMP format and not in TIFF or any other image file extension.
