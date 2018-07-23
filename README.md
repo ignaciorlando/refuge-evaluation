@@ -60,13 +60,10 @@ Make sure that you have executed ```evaluate_multiple_submission.py``` first, be
 ## Frequent errors in the submissions
 
 ### Compression format
-
 Make sure to use a .zip file and not .rar or any other compression format.
 
 ### ZIP file organization
-
 Make sure that you compress a folder with the name of your team, containing all the results that you want to evaluate, in the format provided in the website.
 
-###CSV files without header
-
+### CSV files without header
 The evaluation code for fovea detection / glaucoma classification takes .csv files as inputs. These files have to have a header identifying each of the columns (e.g. Filename, Glaucoma risk). Make sure that you are introducing these fields in the csv file before submitting!
