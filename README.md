@@ -72,6 +72,10 @@ If you have compressed a folder into a zip file instead of all the files, you wi
 
 Make sure that your submission contains the segmentation masks in BMP format and not in TIFF or any other image file extension.
 
+### File extensions in capital letters
+
+Make sure that your files have the extension in lower case and not in upper case. Otherwise, the list of results filenames will differ from the list of ground truth labels.
+
 ### Segmentation files as RGB
 
 Although there is a patch in the code to deal with segmentation results that were saved as RGB files (with all the channels equal), please make sure that you export them in the correct way.
