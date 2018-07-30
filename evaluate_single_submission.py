@@ -98,7 +98,7 @@ def evaluate_single_submission(results_folder, gt_folder, output_path=None, expo
     if path.exists(fovea_location_filename):
         print('> Evaluating fovea location results')
         # prepare the filename to the fovea location gt
-        gt_filename = path.join(gt_folder, 'Fovea_location.xlsx')
+        gt_filename = path.join(gt_folder, 'Fovea_locations.xlsx')
         # get the mean euclidean distance
         try:
             fovea_location_performance = evaluation_metrics_for_fovea_location.evaluate_fovea_location_results(fovea_location_filename, gt_filename,
