@@ -24,14 +24,22 @@ def segmentation_leaderboard(metrics, teams, results):
     results = results[idx,:]
 
     # rank for each segmentation metric
-    ranking_for_optic_cup, _ = best_is_highest(metrics, results, 'Mean optic cup Dice')
-    ranking_for_optic_disc, _ = best_is_highest(metrics, results, 'Mean optic disc Dice')
-    ranking_for_cup_to_disc_ratio, _ = best_is_lowest(metrics, results, 'MAE cup to disc ratio')
+    ranking_for_optic_cup, optic_cup_dice = best_is_highest(metrics, results, 'Mean optic cup Dice')
+    ranking_for_optic_disc, optic_disc_dice = best_is_highest(metrics, results, 'Mean optic disc Dice')
+    ranking_for_cup_to_disc_ratio, cdr = best_is_lowest(metrics, results, 'MAE cup to disc ratio')
 
     # sum all the rankings and rank as the best the one with the highest sum
-    scores = np.zeros(len(ranking_for_optic_cup))
+    scores = np.zeros(len(teams))
+    scores_optic_cup = np.zeros(len(teams))
+    scores_optic_disc = np.zeros(len(teams))
+    scores_cup_to_disc_ratio = np.zeros(len(teams))
     for i in range(0, len(teams)):
-        scores[i] = ranking_for_optic_cup.index(i) + ranking_for_optic_disc.index(i) + ranking_for_cup_to_disc_ratio.index(i)
+        scores_optic_cup[i] = ranking_for_optic_cup.index(i)
+        scores_optic_disc[i] = ranking_for_optic_disc.index(i)
+        scores_cup_to_disc_ratio[i] = ranking_for_cup_to_disc_ratio.index(i) 
+    scores = scores_optic_cup + scores_optic_disc + scores_cup_to_disc_ratio
+    
+    # sort them
     sorted_indices = list((np.argsort(scores.tolist())))
 
     # sort everything
@@ -39,9 +47,9 @@ def segmentation_leaderboard(metrics, teams, results):
 
     scores = np.asarray(scores)[sorted_indices]
 
-    ranking_for_optic_cup = np.asarray(ranking_for_optic_cup)[sorted_indices]
-    ranking_for_optic_disc = np.asarray(ranking_for_optic_disc)[sorted_indices]
-    ranking_for_cup_to_disc_ratio = np.asarray(ranking_for_cup_to_disc_ratio)[sorted_indices]
+    scores_optic_cup = np.asarray(scores_optic_cup)[sorted_indices]
+    scores_optic_disc = np.asarray(scores_optic_disc)[sorted_indices]
+    scores_cup_to_disc_ratio = np.asarray(scores_cup_to_disc_ratio)[sorted_indices]
 
     sorted_optic_cup_dice = np.asarray(get_metric(metrics, results, 'Mean optic cup Dice'))[sorted_indices]
     sorted_optic_disc_dice = np.asarray(get_metric(metrics, results, 'Mean optic disc Dice'))[sorted_indices]
@@ -50,9 +58,9 @@ def segmentation_leaderboard(metrics, teams, results):
     # join all the scores in a single matrix
     all_scores = np.zeros( (len(teams), 7) )
     all_scores[:,0] = scores+1
-    all_scores[:,1] = ranking_for_optic_cup+1
-    all_scores[:,2] = ranking_for_optic_disc+1
-    all_scores[:,3] = ranking_for_cup_to_disc_ratio+1
+    all_scores[:,1] = scores_optic_cup+1
+    all_scores[:,2] = scores_optic_disc+1
+    all_scores[:,3] = scores_cup_to_disc_ratio+1
     all_scores[:,4] = sorted_optic_cup_dice
     all_scores[:,5] = sorted_optic_disc_dice
     all_scores[:,6] = sorted_cdr
