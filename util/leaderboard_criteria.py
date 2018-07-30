@@ -96,7 +96,13 @@ def classification_leaderboard(metrics, teams, results):
     # sort everything
     teams = np.asarray(teams, dtype=np.str)[sorted_indices].tolist()
 
-    return teams, scores, ['Team', 'AUC']
+    reference_sensitivity = np.asarray(results[:, metrics.index('Reference Sensitivity')])[sorted_indices]
+
+    all_scores = np.zeros( (len(teams), 2) )
+    all_scores[:,0] = scores
+    all_scores[:,1] = reference_sensitivity
+
+    return teams, all_scores, ['Team', 'AUC', 'Reference Sensitivity']
 
 
 
