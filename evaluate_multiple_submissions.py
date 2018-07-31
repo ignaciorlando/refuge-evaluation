@@ -1,6 +1,8 @@
 
 from os import path, makedirs
 
+from shutil import rmtree
+
 from evaluate_single_submission import evaluate_single_submission
 from util.file_management import unzip_submission, get_filenames, parse_boolean, export_table_of_results, export_table_of_results
 
@@ -24,8 +26,9 @@ def evaluate_multiple_submissions(submissions_folder, gt_folder, uncompressed_fi
     classification_results = []
     fovea_detection_results = []
     # initialize the output folders
-    if not path.exists(uncompressed_files_folder):
-        makedirs(uncompressed_files_folder)
+    if path.exists(uncompressed_files_folder):
+        rmtree(uncompressed_files_folder)
+    makedirs(uncompressed_files_folder)
     if not path.exists(output_path):
         makedirs(output_path)
 
