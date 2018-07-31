@@ -14,17 +14,17 @@ def euclidean_distance(gt_coordinates, fovea_coordinates):
         gt_coordinates: a 2D numpy array of coordinates for the fovea, according to the ground truth
         fovea_coordinates: a 2D numpy array of coordinates for the fovea, according to the algorithm
     Output:
-        eucledian_distances: a 1D numpy array with the Euclidean distance
+        euclidean_distances: a 1D numpy array with the Euclidean distance
     '''
 
     # compute the euclidean distance
-    eucledian_distances = np.sqrt(np.sum(np.power(gt_coordinates - fovea_coordinates, 2), axis=1))
+    euclidean_distances = np.sqrt(np.sum((gt_coordinates - fovea_coordinates)**2, axis=1))
 
-    return eucledian_distances
+    return euclidean_distances
 
 
 
-def evaluate_fovea_location_results(prediction_filename, gt_filename, output_path=None):
+def evaluate_fovea_location_results(prediction_filename, gt_filename, output_path=None, is_training=False):
     '''
     Evaluate the results of a fovea location algorithm
 
@@ -32,12 +32,13 @@ def evaluate_fovea_location_results(prediction_filename, gt_filename, output_pat
         prediction_filename: full path with file name to a .csv file with the fovea location gt annotations
         gt_filename: full path with file name to a .csv file with the fovea location results of an automated algorithm
         [output_path]: a folder where the results will be saved. If not provided, the results are not saved
+        [is_training]: a boolean indicating whether we are using training data or not
     '''
 
     # read the prediction filename
     image_filenames, predicted_coordinates = read_fovea_location_results(prediction_filename)
     # read the gt filename
-    gt_image_filenames, gt_coordinates = read_gt_fovea_location(gt_filename)
+    gt_image_filenames, gt_coordinates = read_gt_fovea_location(gt_filename, is_training)
 
     # sort the gt filenames using the same order as predicted
     gt_coordinates = sort_coordinates_by_filename(image_filenames, gt_image_filenames, gt_coordinates)

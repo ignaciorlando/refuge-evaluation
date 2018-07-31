@@ -318,13 +318,14 @@ def read_fovea_location_results(csv_filename):
 
 import openpyxl
 
-def read_gt_fovea_location(xlsx_filename):
+def read_gt_fovea_location(xlsx_filename, is_training=False):
     '''
     Read a XLSX file with 3 columns: the first contains the filenames, and the second/third have
     the (x,y) coordinates, respectively.
 
     Input:
         xlsx_filename: full path and filename to a three columns XLSX file with the fovea location results (image filename, x, y)
+        [is_training]: boolean indicating if we are using training data or no
     Output:
         image_filenames: list of image filenames, as retrieved from the first column of the CSV file
         coordinates: a 2D numpy array of coordinates
@@ -343,7 +344,10 @@ def read_gt_fovea_location(xlsx_filename):
         # append the filename
         image_filenames = image_filenames + [ row[1].value ]
         # append the coordinates
-        current_coordinates = np.asarray( [ float(row[2].value), float(row[3].value) ], dtype=np.float )
+        if is_training:
+            current_coordinates = np.asarray( [ float(row[2].value), float(row[3].value) ], dtype=np.float )
+        else:
+            current_coordinates = np.asarray( [ float(row[3].value), float(row[4].value) ], dtype=np.float )
         if coordinates is None:
             coordinates = current_coordinates
         else:
