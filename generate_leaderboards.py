@@ -2,7 +2,7 @@
 from os import path
 
 from util.file_management import read_table_of_results, export_ranking
-from util.leaderboard_criteria import segmentation_leaderboard, classification_leaderboard, fovea_location_leaderboard
+from util.leaderboard_criteria import segmentation_leaderboard, classification_leaderboard, fovea_location_leaderboard, final_leaderboard
 
 
 def generate_leaderboard(results_table_filename, leaderboard_filename, criterion):
@@ -42,3 +42,4 @@ if __name__ == '__main__':
     generate_leaderboard(args.results_table_filename, path.join(args.output_path, 'segmentation_leaderboard.csv'), segmentation_leaderboard)
     generate_leaderboard(args.results_table_filename, path.join(args.output_path, 'classification_leaderboard.csv'), classification_leaderboard)
     generate_leaderboard(args.results_table_filename, path.join(args.output_path, 'fovea_location_leaderboard.csv'), fovea_location_leaderboard)
+    generate_leaderboard(args.results_table_filename, path.join(args.output_path, 'final_leaderboard.csv'), final_leaderboard)

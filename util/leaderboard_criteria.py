@@ -37,7 +37,7 @@ def segmentation_leaderboard(metrics, teams, results):
         scores_optic_cup[i] = ranking_for_optic_cup.index(i)
         scores_optic_disc[i] = ranking_for_optic_disc.index(i)
         scores_cup_to_disc_ratio[i] = ranking_for_cup_to_disc_ratio.index(i) 
-    scores = scores_optic_cup + scores_optic_disc + scores_cup_to_disc_ratio
+    scores = 0.5 * scores_optic_cup + 0.25 * scores_optic_disc + 0.4 * scores_cup_to_disc_ratio
     
     # sort them
     sorted_indices = list((np.argsort(scores.tolist())))
@@ -134,7 +134,68 @@ def fovea_location_leaderboard(metrics, teams, results):
     teams = np.asarray(teams, dtype=np.str)[sorted_indices].tolist()
 
     return teams, scores, ['Team', 'Mean Euclidean distance']
-    
+
+
+
+def final_leaderboard(metrics, teams, results):
+    '''
+    Sort the teams for the final leaderboard
+
+    Input:
+        metrics: a list of the metrics in results, in the same order than the columns of results
+        teams: a list of strings with the names of the teams participating
+        results: a 2D numpy matrix with all the evaluation metrics
+    Output:
+        teams: the list of the teams, but sorted
+        scores: a numpy array with the scores
+        header: the names for the 2 columns
+    '''
+
+    # get the ranks for segmentation and classification
+    teams_segmentation, _, _ = segmentation_leaderboard(metrics, teams, results)
+    scores_segmentation = list(range(1, len(teams_segmentation)+1))
+    teams_classification, _, _ = classification_leaderboard(metrics, teams, results)
+    scores_classification = list(range(1, len(teams_classification)+1))
+
+    # check if the size is different
+    if not ( len(teams_segmentation) == len(teams_classification) ):
+        # remove those that didn't participated in everything
+        if len(teams_segmentation) < len(teams_classification):
+            to_remove = list(set(teams_classification) - set(teams_segmentation))
+            for i in range(len(to_remove)):
+                idx = teams_classification.index(to_remove[i])
+                del teams_classification[idx]
+                del scores_classification[idx]
+            teams = teams_segmentation
+        else:
+            to_remove = list(set(teams_segmentation) - set(teams_classification))
+            for i in range(len(to_remove)):
+                idx = teams_segmentation.index(to_remove[i])
+                del teams_segmentation[idx]
+                del scores_segmentation[idx]
+            teams = teams_classification
+
+    scores_segmentation = np.asarray(scores_segmentation)
+    scores_classification = np.asarray(scores_classification)
+
+    # compute the scores
+    scores = np.zeros(len(teams))
+    for i in range(len(teams)):
+        idx_segm = teams_segmentation.index(teams[i])
+        idx_class = teams_classification.index(teams[i])
+        scores[i] = 0.6 * scores_segmentation[idx_segm] + 0.4 * scores_classification[idx_class]
+    # sort the scores in ascending order
+    sorted_indices = list((np.argsort(scores.tolist())))
+    # sort everything
+    teams = np.asarray(teams, dtype=np.str)[sorted_indices].tolist()
+    final_scores = np.zeros((len(teams),3))
+    final_scores[:,0] = scores[sorted_indices]
+    for i in range(len(teams)):
+        final_scores[i,1] = scores_segmentation[teams_segmentation.index(teams[i])]
+        final_scores[i,2] = scores_classification[teams_classification.index(teams[i])]
+        
+    return teams, final_scores, ['Team', 'Scores', 'Segmentation rank', 'Classification rank']
+
 
 
 def get_metric(metrics, results, selected_metric):
