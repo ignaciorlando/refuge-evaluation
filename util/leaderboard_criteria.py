@@ -37,7 +37,7 @@ def segmentation_leaderboard(metrics, teams, results):
         scores_optic_cup[i] = ranking_for_optic_cup.index(i)
         scores_optic_disc[i] = ranking_for_optic_disc.index(i)
         scores_cup_to_disc_ratio[i] = ranking_for_cup_to_disc_ratio.index(i) 
-    scores = 0.5 * scores_optic_cup + 0.25 * scores_optic_disc + 0.4 * scores_cup_to_disc_ratio
+    scores = 0.35 * scores_optic_cup + 0.25 * scores_optic_disc + 0.4 * scores_cup_to_disc_ratio
     
     # sort them
     sorted_indices = list((np.argsort(scores.tolist())))
