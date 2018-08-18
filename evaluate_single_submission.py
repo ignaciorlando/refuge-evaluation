@@ -93,6 +93,8 @@ def evaluate_single_submission(results_folder, gt_folder, output_path=None, expo
 
     # prepare the path to the fovea location results
     fovea_location_filename = path.join(results_folder, 'fovea_location_results.csv')
+    if not path.exists(fovea_location_filename):
+        fovea_location_filename = path.join(results_folder, 'fovea_localization_results.csv')
 
     # check if there are fovea location results
     if path.exists(fovea_location_filename):
