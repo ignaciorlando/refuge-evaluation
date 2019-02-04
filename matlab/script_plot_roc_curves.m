@@ -10,10 +10,18 @@ config_plot_roc_curves;
 % retrieve teams names
 teams_names = listdir(input_path);
 
-%% sort the team names by their AUC
+% check for baselines
+is_baseline = regexpcmp(teams_names, '__BASELINE__*');
+if any(is_baseline)
+    baselines = teams_names(is_baseline);
+    teams_names(is_baseline) = [];
+end
+
+%% sort the team names by their AUC and load the results of the baselines
 
 % initialize the array of auc values
 auc_values = zeros(length(teams_names), 1);
+auc_values_baselines = zeros(length(baselines), 1);
 
 % load all the auc values
 for i = 1 : length(teams_names)
@@ -21,6 +29,14 @@ for i = 1 : length(teams_names)
     loaded_roc = load(fullfile(input_path, teams_names{i}, 'roc_curve.mat'));
     % assign the auc value
     auc_values(i) = loaded_roc.auc;
+end
+
+% same for the baselines
+for j = 1 : length(baselines)
+    % load the roc curve
+    loaded_roc = load(fullfile(input_path, baselines{j}, 'roc_curve.mat'));
+    % assign the auc value
+    auc_values_baselines(j) = loaded_roc.auc;
 end
 
 % sort the auc values and retrieve the indices
@@ -37,9 +53,9 @@ figure(1);
 close all
 hold on
 % initialize the legend
-legend_for_roc = cell(length(teams_names), 1);
+legend_for_roc = cell(length(teams_names) + length(baselines), 1);
 % get the colors
-colors = distinguishable_colors(length(teams_names));
+colors = distinguishable_colors(length(teams_names) + length(baselines));
 
 % load the roc curve and plot current results
 for i = 1 : length(teams_names)
@@ -55,7 +71,23 @@ for i = 1 : length(teams_names)
     end
     disp(current_team_name);
     % add the team to the legend
-    legend_for_roc{i} = [current_team_name, ' - AUC=', num2str(auc_values(i))];
+    legend_for_roc{i} = [current_team_name, ' - AUC=', num2str(round(auc_values(i), 4))];
+end
+
+i=i+1;
+for j = 1 : length(baselines)
+    % load the roc curve
+    loaded_roc = load(fullfile(input_path, baselines{j}, 'roc_curve.mat'));
+    % plot the curve
+    plot(loaded_roc.fpr, loaded_roc.tpr, 'LineWidth', 1.5, 'Color', colors(i,:));
+    switch baselines{j}
+        case '__BASELINE__VCDR'
+            current_baseline_name = 'vCDR from ground truth';
+    end
+    disp(current_baseline_name);
+    % add the baseline to the legend
+    legend_for_roc{i} = [current_baseline_name, ' - AUC=', num2str(round(auc_values_baselines(j), 4))];
+    i=i+1;
 end
 
 % setup the plot
