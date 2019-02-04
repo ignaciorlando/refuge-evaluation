@@ -45,6 +45,7 @@ teams_names = table2array(mean_table(:,1));
 
 % get the idx
 [rank, idx] = sort(table2array(mean_table(:, strcmp(mean_table.Properties.VariableNames, rank_id))));
+idx = idx(end:-1:1);
 % sort the teams names
 teams_names = teams_names(idx);
 % sort the average performance
