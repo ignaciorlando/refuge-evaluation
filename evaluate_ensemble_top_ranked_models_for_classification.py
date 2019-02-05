@@ -1,6 +1,6 @@
 
 from evaluation_metrics.evaluation_metrics_for_classification import get_roc_curve, get_sensitivity_at_given_specificity
-from util.file_management import parse_boolean, get_filenames, get_labels_from_training_data, read_gt_labels, save_roc_curve, save_csv_classification_performance, read_csv_classification_results, sort_scores_by_filename
+from util.file_management import parse_boolean, get_filenames, get_labels_from_training_data, read_gt_labels, save_roc_curve, save_csv_classification_performance, read_csv_classification_results, sort_scores_by_filename, save_csv_classification_results
 
 import numpy as np
 
@@ -78,7 +78,13 @@ def ensemble_models(ensemble_folder, gt_filenames, output_folder):
         # normalize scores
         ensemble_scores[:,i] = predicted_scores / np.max(predicted_scores)
 
-    return np.mean(ensemble_scores, axis=1)
+    # generate average likelihoods
+    ensemble_scores = np.mean(ensemble_scores, axis=1)
+
+    # save the ensemble
+    save_csv_classification_results(path.join(ensemble_folder, 'classification_results.csv'), gt_filenames, ensemble_scores)
+
+    return ensemble_scores
 
     
 

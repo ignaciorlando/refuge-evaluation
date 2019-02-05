@@ -1,7 +1,7 @@
 
 from evaluation_metrics.evaluation_metrics_for_segmentation import vertical_cup_to_disc_ratio
 from evaluation_metrics.evaluation_metrics_for_classification import get_roc_curve, get_sensitivity_at_given_specificity
-from util.file_management import parse_boolean, get_filenames, get_labels_from_training_data, read_gt_labels, save_roc_curve, save_csv_classification_performance
+from util.file_management import parse_boolean, get_filenames, get_labels_from_training_data, read_gt_labels, save_roc_curve, save_csv_classification_performance, save_csv_classification_results
 
 import numpy as np
 
@@ -39,6 +39,9 @@ def evaluate_gt_vcdr_for_classification(gt_folder, output_folder, is_training=Fa
 
     # get the cup to disc ratio for each image
     vertical_cdr_values = export_vertical_cup_to_disc_ratios(gt_segmentation_folder, gt_filenames, output_folder, is_training)
+
+    # save the vCDR values in a CSV file
+    save_csv_classification_results(path.join(output_folder, 'classification_results.csv'), gt_filenames, vertical_cdr_values)
 
     # compute the ROC curve
     sensitivity, fpr, auc = get_roc_curve(vertical_cdr_values, gt_labels)
